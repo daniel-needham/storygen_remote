@@ -1,0 +1,14 @@
+{
+  "id": 0,
+  "genre": "love_stories",
+  "story_generation": {
+    "premise": "a forbidden love story, between a young farmer and an aristocrat. the young farmer is struck by terminal cancer, and the aristocrat must choose between a short love or her family",
+    "characters": [
+        {"name": "Steve Robinson", "description": "A young man"}
+    ],
+    "plot_points": {
+      "1.2": {"description": "Steve meets Lady Dee", "characters": ["Steve Robinson", "Lady Dee"]}, "1.3": {"description": "Steve Robinson and Lady Dee fall in love at the country fair", "characters": ["Steve Robinson", "Lady Dee"]}, "2.1": {"description": "Steve is struck by terminal cancer", "characters": ["Lady Dee", "Steve Jones"]}
+    }
+  }
+
+}
