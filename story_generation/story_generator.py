@@ -6,6 +6,8 @@ from vllm import EngineArgs, LLMEngine, SamplingParams, RequestOutput, LLM
 from vllm.lora.request import LoRARequest
 
 from utils import *
+import genre as import_genre
+from genre import Genre
 from ingest_story_json import ingest_story_json
 import logging.config
 
@@ -30,21 +32,10 @@ class StoryGenerator:
     def ingest_structure(self, structure_path: str):
         json = ingest_story_json(structure_path)
         self.id = json['id']
-        self.genre = json['genre']
+        self.genre = import_genre.create(json['genre'])
         self.premise = json['story_generation']['premise']
         self.characters = json['story_generation']['characters']
         self.plot_points = json['story_generation']['plot_points']
-
-    # perform named entity recognition on the plot points to extract the characters
-    def _get_prompt_ready_genre(self):
-        if self.genre == "love_stories":
-            return "love stories"
-        elif self.genre == "science_fiction":
-            return "science fiction"
-        elif self.genre == "ghost_stories":
-            return "ghost stories"
-        else:
-            return "fiction"
 
     def _get_prompt_ready_premise(self):
         return "Premise: " + self.premise
@@ -124,7 +115,7 @@ Resolution
                 # generate the plot point
                 current_plot_prompt = self._plot_points_to_prompt()
                 plot_point_prompt = """[INST]You are a renowned writer specialising in the genre of {}. You are able to create engaging narratives following a three act structure. Using the [Story Structure] outline, fill the [Story Events] suitable for the story as outlined in the premise.\n{}{}{}\nCreate a single event for the plot point {}, keep it concise and avoid repeating previous plot points.[/INST] {} {}:"""
-                plot_point_prompt = plot_point_prompt.format(self._get_prompt_ready_genre(), self.structure_template, self._get_prompt_ready_premise(), current_plot_prompt, plot_point_idx, plot_point_idx, plot_point_desc)
+                plot_point_prompt = plot_point_prompt.format(self.genre.__str__(), self.structure_template, self._get_prompt_ready_premise(), current_plot_prompt, plot_point_idx, plot_point_idx, plot_point_desc)
                 output = ""
                 counter = 0
                 while output == "":
