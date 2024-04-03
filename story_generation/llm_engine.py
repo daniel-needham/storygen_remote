@@ -29,6 +29,8 @@ class GenEngine:
         self.engine = initialize_engine()
         self.sf_lora = snapshot_download("ogdanneedham/mistral-sf-0.1-lora")
 
+
+    ### todo add the other genres
     def convert_genre_to_lora(self, test_prompts: List[Tuple[str, SamplingParams,
                          Optional[Genre]]]) -> List[Tuple[str, SamplingParams,
                          Optional[LoRARequest]]]:
@@ -44,7 +46,9 @@ class GenEngine:
                          test_prompts: List[Tuple[str, SamplingParams,
                          Optional[Genre]]]):
         """Continuously process a list of prompts and handle the outputs."""
+        request_outputs = []
         request_id = 0
+        test_prompts = self.convert_genre_to_lora(test_prompts)
 
         while test_prompts or self.engine.has_unfinished_requests():
             if test_prompts:
@@ -57,6 +61,4 @@ class GenEngine:
 
             request_outputs: List[RequestOutput] = self.engine.step()
 
-            for request_output in request_outputs:
-                if request_output.finished:
-                    print(request_output)
+        return request_outputs

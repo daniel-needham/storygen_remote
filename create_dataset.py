@@ -8,6 +8,7 @@ from utils import load_text_file
 import re
 
 nltk.download('punkt')
+nltk.download('stopwords')
 
 
 def dynamic_print(message):
@@ -110,7 +111,7 @@ def create_dataset(file_path, paragraph_amount_range=(10,20), excerpts_per_book=
 
     return pd.DataFrame({'book_id': book_id, 'indices': indices, 'example': examples})
 
-def create_dataset_tiling(file_path, force_tokenize, n_examples=1500, target_chunk_size=300):
+def create_dataset_tiling(file_path, force_tokenize, n_examples=1500, target_chunk_size=300, filter_len=None):
     df = pd.read_csv(file_path + "/metadata.csv")
 
     book_id = []
@@ -170,7 +171,8 @@ def create_dataset_tiling(file_path, force_tokenize, n_examples=1500, target_chu
     df = pd.DataFrame({'book_id': book_id, 'index': indexes, 'example': examples, 'length': lengths})
 
     # filter the dataframe to only contain samples with a length of at least 200
-    df = df[df['length'] > 900]
+    if filter_len:
+        df = df[df['length'] > 900]
 
     if len(df) < n_examples:
         print(f"Only {len(df)} examples available, returning all of them.")
@@ -179,5 +181,5 @@ def create_dataset_tiling(file_path, force_tokenize, n_examples=1500, target_chu
 
     return df.sample(n=min(n_examples, len(df)))
 
-df = create_dataset_tiling('data/science_fiction', force_tokenize=True, n_examples=1500, target_chunk_size=50)
-df.to_csv('data/science_fiction/science_fiction_tiling.csv', index=False)
+df = create_dataset_tiling('data/love_stories', force_tokenize=False, n_examples=9999, target_chunk_size=50, filter_len=None)
+df.to_csv('data/love_stories/love_stories_tiling.csv', index=False)

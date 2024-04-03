@@ -1,28 +1,23 @@
-from utils import load_text_file
-from vllm import LLM, SamplingParams
 
-story_structure = load_text_file('story_structure.txt')
+from llm_engine import *
+from genre import Genre
+
+## run test
+draft_prompt = """[INST] You are a renowned creative writer specialising in the genre of science fiction. Write a narrative section in the third person, where a man discovers a locked book, which may contain answers to the mystery of the stately home he is currently staying in. There is a strange chill in the air, as the suspicious maid enters the parlour [/INST]"""
+
+# Load the model
+gen = GenEngine()
 
 
-llm = LLM(model="mistralai/Mistral-7B-Instruct-v0.2")
+sampling_params = SamplingParams(max_tokens=4096,
+                                         temperature=0.7,
+                                         top_k=50,
+                                         repetition_penalty=0.5,
+                                         frequency_penalty=1.19,
+                                         )
 
-sampling_params = SamplingParams(max_tokens=4096, # set it same as max_seq_length in SFT Trainer
-                  temperature=0.2,
-                  skip_special_tokens=True)
-
-PROMPT_TEMPLATE = """[INST]You are a renowned writer specialising in the genre of {}. Using the [Story Structure] and the given [Story Events], create a numbered structure with descriptions of each of the events. Try to preserve the ordering of the given [Story Events] in the generated story structure.\n{}\n{}[/INST]"""
-
-events = ["[Story Events]"] + ["John has a large heart", "john meets mary", "john and mary meet john's ex girlfriend", " a love triangle forms", "john dies"] + ["[/Story Events]"]
-
-events = "\n".join(events)
-
-print(events)
-
-genre = "love stories"
-
-prompt = PROMPT_TEMPLATE.format(genre, story_structure, events)
-
-output = llm.generate(prompt, sampling_params)
+# Generate the story
+output = gen.process_requests([(draft_prompt, sampling_params, Genre.SCIENCE_FICTION)])
+output = output[0].outputs[0].text
 
 print(output)
-print(output[0].outputs)
